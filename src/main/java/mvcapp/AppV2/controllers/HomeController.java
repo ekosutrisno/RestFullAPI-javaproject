@@ -16,6 +16,7 @@ public class HomeController {
 
   @GetMapping("/index")
   public String viewIndex() {
-    return "index";
+    return "contoh";
   }
+
 }

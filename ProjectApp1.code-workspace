@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"java.dependency.syncWithFolderExplorer": true,
+		"java.configuration.updateBuildConfiguration": "disabled"
+	}
+}

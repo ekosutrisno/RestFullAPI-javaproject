@@ -1,0 +1,210 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:with="http://www.thymeleaf.org/extras/with" layout:decorate="~{layout}" with:title="'B210'">
+<th:block layout:fragment="content">
+  <div class="bottom">
+    <div class="col">
+      <div class="container-fluid">
+        <h1 class="mb-2 mt-3">Departement</h1>
+        <button id="add_button" class="btn btn-primary btn-sm nBtn mb-3"> New Department </button>
+        <div class="card">
+          <div class="card-block">
+            <table class="table table-hover table-bordered table-responsive-sm table-sm">
+              <thead class="">
+                <tr>
+                  <th>Department Id</th>
+                  <th>Department Name</th>
+                  <th>Location Id</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody id="data_rows">
+                <!-- Tempat data di isikan oleh java script -->
+              </tbody>
+
+            </table>
+            <hr />
+          </div>
+          <div class="modal-body">
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal untuk menampilkna cuy..tinggal modif aja isinya sesuai kebutuhan -->
+  <div class="modal fade" id="modal-employee">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-judul">Add Employee</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="action" value="">
+          <form id="get_form_employee">
+            <input type="hidden" id="get_id" name="id" class="get_employee" value="">
+            <div class="form-group">
+              <label for="department_name">Department Name</label>
+              <input type="text" name="name" id="department_name" class="form-control get_employee">
+            </div>
+            <div class="form-group">
+              <label for="location_id">Location ID</label>
+              <input type="text" name="name" id="location_id" class="form-control get_employee">
+            </div>
+          </form>
+        </div> <!-- /.modal-body -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary get_employee" id="save_button">Save
+          </button>
+        </div> <!-- /.modal-footer -->
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+</th:block>
+
+<th:block layout:fragment="contoh">
+
+  <script>
+    // showing data
+    $(document).ready(function () {
+      get_all_data();
+    });
+
+    function get_all_data() {
+      var number = 1;
+      $("#data_rows").html(
+        `<tr> <td colspan="4" style="text-align:center"><i>Loading...</i> </td></td></tr>`
+      )
+      $.ajax({
+        url: 'api/department',
+        type: 'get',
+        contentType: "application/json",
+        success: function (result) {
+
+          $("#data_rows").html("");
+          if (result.length > 0) {
+            for (let i = 0; i < result.length; i++) {
+              $("#data_rows").append(
+                `
+                        <tr>
+                        <td> ` + number + `</td>
+                        <td> ` + result[i].departementName + `</td>
+                        <td> ` + result[i].locationId + `</td>
+
+                        <td>
+                        <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-info">Aksi</button>
+                        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" onclick="get_data_byid(` + result[i].deparatementId + `,'edit')" >Edit</a></li>
+                            <li><a class="dropdown-item" onclick="hapus(` + result[i].deparatementId + `)">Hapus</a></li>
+                            <li><a class="dropdown-item" onclick="get_data_byid(` + result[i].deparatementId + `,'detail')" >Detail</a></li>
+                        </ul>
+                    </div>
+                        </td>
+                       </tr> `);
+              number++;
+            }
+          } else {
+            $("#data_rows").html(
+              `<tr> <td colspan="4" style="text-align:center"><i>Loading...</i> </td></tr>`
+            )
+          }
+        },
+        error: function () {
+          swal("", "Failed to fetch data")
+        }
+      });
+
+    };
+
+    // get data by id departemen
+    function get_data_byid(id, action) {
+      $("#action").val(action);
+      $.ajax({
+
+        url: 'api/department/' + id,
+        type: 'get',
+        contentType: "application/json",
+        success: function (result) {
+          $("#get_form_employee")[0].reset();
+          $("#get_id").val(result.id);
+
+          $("#department_id").val(result.deparatementId);
+          $("#department_name").val(result.departementName);
+          $("#location_id").val(result.locationId);
+
+          if (action == "detail") {
+            $(".modal-judul").text("Detail Department ");
+            $(".get_employee").attr("disabled", true);
+          } else {
+            $(".modal-judul").text("Edit Department");
+            $(".get_employee").attr("disabled", false);
+          }
+          $("#modal-employee").modal("show");
+        },
+
+        error: function () {
+          swal.fire("", "Failed to fetch the data", "error");
+        }
+
+      });
+    };
+
+    $("#add_button").click(function () {
+
+      $(".modal-judul").text("Add Department");
+      $(".get_employee").attr("disabled", false);
+      $("#get_form_employee")[0].reset();
+      $("#get_id").val("");
+      $("#action").val("add");
+
+      $("#modal-employee").modal("show");
+    });
+
+    $("#save_button").click(function () {
+      var action = $("#action").val();
+
+      var data = {
+        deparatementId: $("#get_id").val(),
+        departementName: $("#department_id").val(),
+        locationId: $("#location_id").val()
+      }
+
+      if (action == "add") {
+        type = 'post';
+      } else if (action == "edit") {
+        type = 'put';
+      }
+      $.ajax({
+        url: 'api/department',
+        type: type,
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        success: function (result) {
+          $("#get_form_employee")[0].reset();
+          swal("", "Successfully " + action + " data", "success").then((value) => {
+            get_all_data();
+            $("#modal-employee").modal("hide");
+          });
+        },
+        error: function () {
+          swal.fire("", "Failed to " + action + " data", "error");
+        }
+      })
+    })
+  </script>
+
+</th:block>

@@ -1,22 +1,26 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<th:block layout:insert="~{fragments/htmlhead}" />
+<th:block layout:insert="~{fragments/header}" />
 
-<body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+<body class="" id="page-top">
+  <div id="wrapper">
+    <th:block layout:replace="~{fragments/sidebar}" />
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+        <th:block layout:replace="~{fragments/topbar}" />
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
 
-        <th:block layout:replace="~{fragments/navigation}" />
-        <th:block layout:replace="~{fragments/sidebar}" />
-        <div class="content-wrapper">
-            <th:block layout:fragment="content" />
+          <th:block layout:fragment="content" />
+
         </div>
-        
-        <th:block layout:replace="~{fragments/userpanel}" />
-        <th:block layout:replace="~{fragments/footer}" />
-        <th:block layout:replace="~{fragments/controlbar}" />
-
+      </div>
+      <th:block layout:replace="~{fragments/footer}" />
     </div>
-    <!-- ./wrapper -->
-    <th:block layout:insert="~{fragments/body_scripts :: end}" />
+
+
+  </div>
+  <!-- ./wrapper -->
+  <th:block layout:insert="~{fragments/myscript :: end}" />
 </body>
 
 </html>
